@@ -2,8 +2,7 @@
 
 A vertical matrix on a single strategy (`@Retry`), asserting invocation counts. The bean's
 method always throws, so the number of invocations equals `1 + maxRetries` for the effective
-configuration. This is the design discussed with the SmallRye maintainer in
-smallrye/smallrye-fault-tolerance#1276.
+configuration.
 
 Axes:
 
@@ -25,7 +24,7 @@ Axes:
 | 10 to 13 | methodAnnotationOverridesRetryIn{...} | method override | all four | method (3) | 4 | method-level precedence |
 | 14 to 17 | methodAnnotationTakesPrecedenceOverClassAnd{...} | class and method | all four | method (3) over class (2) | 4 | method over class precedence |
 
-Total: 17 tests.
+Subtotal (matrix plus negative baseline): 17 tests.
 
 ## @Inherited rule (2 tests)
 
@@ -60,15 +59,20 @@ gap to stereotype discovery.
 
 ## Notes for reviewers
 
-- Why 17 and not a larger product: the matrix varies two axes only, placement (4) and location
-  (4), giving 16, plus one negative baseline, for 17. It does not vary other strategies or a
-  fallback, because this is deliberately a single-strategy (`@Retry`) vertical matrix. If
-  `@Retry` discovery through a stereotype is correct, the same interceptor-binding mechanism
-  applies to the other annotations.
+- Why 20 and not a larger product: the core matrix varies two axes only, placement (4) and
+  location (4), giving 16, plus one negative baseline (17); the remaining three are targeted
+  cases off those axes (two for the `@Inherited` rule, one for a class-level override that
+  disables retry). It does not vary other strategies or a fallback, because this is deliberately
+  a single-strategy (`@Retry`) vertical matrix. If `@Retry` discovery through a stereotype is
+  correct, the same interceptor-binding mechanism applies to the other annotations.
 - @Timeout is deferred on purpose: the reproducer shows `@Timeout` declared via a stereotype
   diverges in the same way, but the proposed TCK matrix stays on `@Retry` only (invocation
   counts are deterministic and not timing-dependent). A `@Timeout` matrix can follow in a
   separate pull request.
+- Accumulation of different annotation types (for example a stereotype-declared `@Retry` plus a
+  bean-declared `@Fallback`) follows from the same interceptor-binding mechanism but is not
+  asserted by this single-strategy matrix; a multi-strategy matrix could add it if the working
+  group wants it.
 - Determinism and isolation: each test calls `reset()` on its bean before invoking, asserts the
   propagated `TestException`, then checks the invocation count. Counting uses an `AtomicInteger`;
   there are no sleeps and no timing-based assertions, so the tests are deterministic.
@@ -80,11 +84,3 @@ gap to stereotype discovery.
 - Backward compatibility: see `docs/proposed-spec-clarification.md`. This corrects a behaviour
   that some runtimes silently skip today; applications not using stereotype-declared Fault
   Tolerance annotations are unaffected.
-
-## Optional additional case (only if reviewers request it)
-
-Not part of the proposed 20, would be added on request to avoid scope creep:
-
-- Recovery path (a method that fails once then succeeds) under a stereotype-declared `@Retry`:
-  expected 2 invocations with no exception. The current tests cover the exhausted path; this
-  would add the success-after-retry path.

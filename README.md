@@ -76,11 +76,15 @@ direction.
 If the working group considers this in scope, this repository already contains the material to
 move quickly:
 
-- `docs/proposed-test-matrix.md`: the proposed `@Retry` TCK matrix (17 tests), with the
-  invocation-count breakdown and the empirical SmallRye result.
-- `docs/proposed-spec-clarification.md`: a scope statement, a brief draft clarification for
-  the "Relationship to Jakarta Interceptors" section anchored on CDI 8.1.1 and 8.3, and a
-  backward-compatibility note.
+- `docs/proposed-test-matrix.md`: the proposed `@Retry` TCK matrix (20 tests: a 4x4
+  placement-by-location matrix, a negative baseline, two `@Inherited` cases, and one
+  disable-via-override case), with the invocation-count breakdown. All 20 pass when run against
+  SmallRye at the [#1276](https://github.com/smallrye/smallrye-fault-tolerance/pull/1276) merge
+  commit via its TCK runner (`Tests run: 20, Failures: 0, Errors: 0, Skipped: 0`).
+- `docs/proposed-spec-clarification.md`: a scope statement; a brief draft clarification for the
+  "Relationship to Jakarta Interceptors" section, anchored on Jakarta CDI 4.1 8.1.1 and 8.3 and
+  scoped to managed beans at the class level only (producer fields, producer methods and
+  synthetic beans out of scope); and a per-implementation backward-compatibility note.
 
 The TCK tests themselves would be submitted as a separate pull request to the
 microprofile-fault-tolerance repository once scope is confirmed.
